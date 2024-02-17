@@ -23,17 +23,10 @@ public class ExamService {
         List ExamCandidateList = new ArrayList<>();
         try {
             //티어별 문제 리스트 특정 페이지 가져오기
-            Document document = Jsoup.connect(URL+selectedTier).get();
-            Elements pageList = document.select("div.text-center ul.pagination li");
-            int randomPageNumber = new Random().nextInt(pageList.size());
-            Document selectedPageUrl = Jsoup.connect(URL+selectedTier+"&page="+randomPageNumber).get();
+            Document selectedPageUrl = getDocument(selectedTier);
             //위에서 가져온 페이지에 포함된 문제번호 파싱
             Elements selectedExam = selectedPageUrl.select("td.list_problem_id");
-            for (Element element : selectedExam) {
-                String parsedElement = element.text();
-                String ExamNumber = parsedElement.replaceAll("[^0-9]", "");
-                ExamCandidateList.add(ExamNumber);
-            }
+            getRandomExamNumber(selectedExam, ExamCandidateList);
             String Exam;
             for (Object examNumber : ExamCandidateList) {
                 return "https://www.acmicpc.net/problem/" + examNumber;
@@ -43,6 +36,22 @@ public class ExamService {
             throw new RuntimeException(e);
         }
         return selectedTier;
+    }
+
+    private static void getRandomExamNumber(Elements selectedExam, List ExamCandidateList) {
+        for (Element element : selectedExam) {
+            String parsedElement = element.text();
+            String ExamNumber = parsedElement.replaceAll("[^0-9]", "");
+            ExamCandidateList.add(ExamNumber);
+        }
+    }
+
+    private Document getDocument(String selectedTier) throws IOException {
+        Document document = Jsoup.connect(URL+ selectedTier).get();
+        Elements pageList = document.select("div.text-center ul.pagination li");
+        int randomPageNumber = new Random().nextInt(pageList.size());
+        Document selectedPageUrl = Jsoup.connect(URL+ selectedTier +"&page="+randomPageNumber).get();
+        return selectedPageUrl;
     }
 
 }
