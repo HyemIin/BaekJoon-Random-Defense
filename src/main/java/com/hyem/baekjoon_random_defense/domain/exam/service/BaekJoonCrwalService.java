@@ -1,7 +1,6 @@
 package com.hyem.baekjoon_random_defense.domain.exam.service;
 
 import com.hyem.baekjoon_random_defense.domain.exam.dto.request.RequestCorrectExamDTO;
-import com.hyem.baekjoon_random_defense.domain.exam.dto.response.GetCorrectExamDTO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,10 +14,10 @@ import java.util.List;
 @Service
 public class BaekJoonCrwalService {
 
-    public List<String> getCorrectExamNumber(RequestCorrectExamDTO requestCorrectExamDTO) {
+    public List<String> getUserCorrectExamNumber(String account) {
         List<String> ExamSuccessNumberList;
         try {
-            Document document = Jsoup.connect("https://www.acmicpc.net/user/"+requestCorrectExamDTO.getEmail()).get();
+            Document document = Jsoup.connect("https://www.acmicpc.net/user/"+account).get();
             Elements exam = document.select("div.problem-list a");
             ExamSuccessNumberList = new ArrayList<>();
             for (Element element : exam) {

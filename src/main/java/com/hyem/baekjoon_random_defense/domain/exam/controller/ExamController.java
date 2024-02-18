@@ -1,6 +1,5 @@
 package com.hyem.baekjoon_random_defense.domain.exam.controller;
 
-import com.hyem.baekjoon_random_defense.domain.exam.dto.request.RequestCorrectExamDTO;
 import com.hyem.baekjoon_random_defense.domain.exam.service.BaekJoonCrwalService;
 import com.hyem.baekjoon_random_defense.domain.exam.service.ExamService;
 import com.hyem.baekjoon_random_defense.domain.global.api.ApiUtils;
@@ -15,10 +14,10 @@ public class ExamController {
     private final ExamService examService;
 
     @PostMapping("/")
-    public ResponseEntity<?> getCorrectExam(@RequestBody RequestCorrectExamDTO requestCorrectExamDTO) {
+    public ResponseEntity<?> getCorrectExam(@RequestParam(name = "account") String account) {
         return ResponseEntity
             .ok()
-            .body(ApiUtils.success(baekJoonCrwalService.getCorrectExamNumber(requestCorrectExamDTO)));
+            .body(ApiUtils.success(baekJoonCrwalService.getUserCorrectExamNumber(account)));
     }
 
     @GetMapping("/")
@@ -26,6 +25,15 @@ public class ExamController {
         return ResponseEntity
             .ok()
             .body(ApiUtils.success(examService.getRamdomExam(tier)));
+    }
+
+    @GetMapping("/challenge")
+    public ResponseEntity<?> getChallengeExam(
+        @RequestParam(name = "tier") String tier,
+        @RequestParam(name = "account") String account) {
+        return ResponseEntity
+            .ok()
+            .body(ApiUtils.success(examService.getChallengeExam(tier, account)));
     }
 
 }

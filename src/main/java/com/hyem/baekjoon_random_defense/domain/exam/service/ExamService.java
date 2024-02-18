@@ -16,29 +16,39 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class ExamService {
+    private final BaekJoonCrwalService baekJoonCrwalService;
     private final String URL = "https://www.acmicpc.net/problemset?sort=no_asc&tier=";
 
     public String getRamdomExam(String tier) {
         String selectedTier = Tier.valueOf(tier).getTier();
-        List ExamCandidateList = new ArrayList<>();
+        List examCandidateList = new ArrayList<>();
+        int randomExamNumber;
         try {
             //티어별 문제 리스트 특정 페이지 가져오기
             Document selectedPageUrl = getDocument(selectedTier);
             //위에서 가져온 페이지에 포함된 문제번호 파싱
             Elements selectedExam = selectedPageUrl.select("td.list_problem_id");
-            getRandomExamNumber(selectedExam, ExamCandidateList);
-            String Exam;
-            for (Object examNumber : ExamCandidateList) {
-                return "https://www.acmicpc.net/problem/" + examNumber;
-            }
-
+            getRandomExamNumber(selectedExam, examCandidateList);
+            randomExamNumber = new Random().nextInt(examCandidateList.size());
+            return "https://www.acmicpc.net/problem/" + examCandidateList.get(randomExamNumber);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return selectedTier;
     }
 
-    private static void getRandomExamNumber(Elements selectedExam, List ExamCandidateList) {
+    public Object getChallengeExam(String tier, String account) {
+        String exam = getRamdomExam(tier);
+        String examNumber = exam.substring(32);
+        List<String> userCorrectExamList = baekJoonCrwalService.getUserCorrectExamNumber(account);
+        for (String s : userCorrectExamList) {
+            if (s.equals(examNumber)) {
+                return getChallengeExam(tier,account);
+            }
+        }
+        return "https://www.acmicpc.net/problem/" + examNumber;
+    }
+
+    private void getRandomExamNumber(Elements selectedExam, List ExamCandidateList) {
         for (Element element : selectedExam) {
             String parsedElement = element.text();
             String ExamNumber = parsedElement.replaceAll("[^0-9]", "");
@@ -50,8 +60,6 @@ public class ExamService {
         Document document = Jsoup.connect(URL+ selectedTier).get();
         Elements pageList = document.select("div.text-center ul.pagination li");
         int randomPageNumber = new Random().nextInt(pageList.size());
-        Document selectedPageUrl = Jsoup.connect(URL+ selectedTier +"&page="+randomPageNumber).get();
-        return selectedPageUrl;
+        return Jsoup.connect(URL+ selectedTier +"&page="+randomPageNumber).get();
     }
-
 }
