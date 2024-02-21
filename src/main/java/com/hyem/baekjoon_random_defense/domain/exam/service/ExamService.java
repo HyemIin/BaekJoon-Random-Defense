@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -22,13 +23,21 @@ public class ExamService {
     public String getRamdomExam(String tier) {
         String selectedTier = Tier.valueOf(tier).getTier();
         List examCandidateList = new ArrayList<>();
+        List examCandidateCorrectPercentList = new ArrayList<>();
         int randomExamNumber;
         try {
             //티어별 문제 리스트 특정 페이지 가져오기
             Document selectedPageUrl = getDocument(selectedTier);
             //위에서 가져온 페이지에 포함된 문제번호 파싱
             Elements selectedExam = selectedPageUrl.select("td.list_problem_id");
+            Elements percentageElement = selectedPageUrl.select("td:eq(5)");
             getRandomExamNumber(selectedExam, examCandidateList);
+            getCorrectPercentList(percentageElement,examCandidateCorrectPercentList);
+            for (int i = 0; i < examCandidateList.size(); i++) {
+                if ((Float) examCandidateCorrectPercentList.get(i) < 30.0) {
+                    examCandidateList.remove(i);
+                }
+            }
             randomExamNumber = new Random().nextInt(examCandidateList.size());
             return "https://www.acmicpc.net/problem/" + examCandidateList.get(randomExamNumber);
         } catch (IOException e) {
@@ -61,5 +70,13 @@ public class ExamService {
         Elements pageList = document.select("div.text-center ul.pagination li");
         int randomPageNumber = new Random().nextInt(pageList.size());
         return Jsoup.connect(URL+ selectedTier +"&page="+randomPageNumber).get();
+    }
+
+    private void getCorrectPercentList(Elements percentageElement, List examCandidateCorrectPercentList) {
+        for (Element element : percentageElement) {
+            String parsedElement = element.text();
+            Float percent = Float.valueOf(parsedElement.replaceAll("[^\\d.]", ""));
+            examCandidateCorrectPercentList.add(percent);
+        }
     }
 }
