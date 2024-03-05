@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ExamController {
     private final BaekJoonCrwalService baekJoonCrwalService;
-    private final ExamService examService;
+    private final ExamService ExamService;
 
     @PostMapping("/")
     public ResponseEntity<?> getCorrectExam(@RequestParam(name = "account") String account) {
@@ -24,7 +24,7 @@ public class ExamController {
     public ResponseEntity<?> getRandomExam(@RequestParam(name = "tier") String tier) {
         return ResponseEntity
             .ok()
-            .body(ApiUtils.success(examService.getRamdomExam(tier)));
+            .body(ApiUtils.success(ExamService.getRamdomExam(tier)));
     }
 
     @GetMapping("/challenge")
@@ -33,7 +33,7 @@ public class ExamController {
         @RequestParam(name = "account") String account) {
         return ResponseEntity
             .ok()
-            .body(ApiUtils.success(examService.getChallengeExam(tier, account)));
+            .body(ApiUtils.success(ExamService.getChallengeExam(tier, account)));
     }
 
 }

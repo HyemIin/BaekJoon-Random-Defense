@@ -1,6 +1,5 @@
 package com.hyem.baekjoon_random_defense.domain.exam.service;
 
-import com.hyem.baekjoon_random_defense.domain.exam.dto.request.RequestCorrectExamDTO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
